@@ -5,6 +5,9 @@ Created on 2018/5/16
 import requests
 import json
 import re
+import pymysql
+import time
+import datetime
 
 
 def get_html(url, data):
@@ -29,8 +32,34 @@ def get_data():
     result = pattern.sub(r'\g<datetime>', result)
     # print(result)
     list_data = json.loads(result)
-    for item in list_data:
-        print(item['DWNAME'], item['AQI'], item['QUALITY'], item['PRIMARY'], item['Msg'])
+    conn = pymysql.Connect(
+        host='localhost',
+        port=3306,
+        user='root',
+        passwd='123456',
+        db='pymysql',
+        charset='utf8'
+    )
+    cursor = conn.cursor()
+    try:
+        for item in list_data:
+            # print(item['DWNAME'], item['AQI'], item['QUALITY'], item['PRIMARY'], item['Msg'])
+            ts = item['AQITIME'] / 1000
+            dt = time.localtime(ts)
+            t = time.strftime("%Y-%m-%d %H:%M:%S", dt)
+            sql = "INSERT INTO air_quality (area, so2_1h, so2_24h, no2_1h, no2_24h, pm10_1h, pm10_24h, co_1h, co_24h, o3_1h, pm2_5_1h, pm2_5_24h, AQI, quality, primary_, msg, time) VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                item['DWNAME'], item['SO2_1H'], item['SO2_24H'], item['NO2_1H'], item['NO2_24H'], item['PM10_1H'],
+                item['PM10_24H'], item['CO_1H'], item['CO_24H'], item['O3_1H'], item['PM2_5_1H'], item['PM2_5_24H'],
+                item['AQI'], item['QUALITY'], item['PRIMARY'], item['Msg'], t)
+            cursor.execute(sql)
+            print(item['DWNAME'], "插入成功！")
+            conn.commit()
+    except Exception as e:
+        print(e)
+        conn.rollback()
+
+    cursor.close()
+    conn.close()
 
 
 if __name__ == '__main__':
