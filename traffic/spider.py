@@ -2,9 +2,8 @@
 Created on 2018/5/16
 @Author: Jeff Yang
 """
-import pymysql
 import requests
-
+from config.db_config import conn
 
 def get_html(url):
     """
@@ -29,14 +28,7 @@ def get_traffic_data():
     RoadData = json_data['RoadData']  # 重点通道
     print('更新时间：', refreshTime)
     refresh_time = refreshTime.replace('年', '-').replace('月', '-').replace('日', '').replace('时', ':').replace('分', '')
-    conn = pymysql.Connect(
-        host='localhost',
-        port=3306,
-        user='root',
-        passwd='123456',
-        db='pymysql',
-        charset='utf8'
-    )
+
     cursor = conn.cursor()
     try:
         print("=============")
@@ -78,6 +70,8 @@ def get_traffic_data():
         print(e)
         conn.rollback()
 
+    cursor.close()
+    conn.close()
 
 if __name__ == '__main__':
     get_traffic_data()

@@ -5,10 +5,10 @@ Created on 2018/5/16
 import requests
 import re
 import json
-import pymysql
 import datetime
 
 from weather.area_code import AREA_CODE
+from config.db_config import conn
 
 
 def get_html(url):
@@ -82,14 +82,7 @@ def get_weather_data():
     # print(json_data['data'])  # 数据
     # print(len(json_data['data']))
     # print(len(AREA_CODE))
-    conn = pymysql.Connect(
-        host='localhost',
-        port=3306,
-        user='root',
-        passwd='123456',
-        db='pymysql',
-        charset='utf8'
-    )
+
     cursor = conn.cursor()
     try:
         for k, v in json_data['data'].items():

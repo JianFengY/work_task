@@ -5,10 +5,10 @@ Created on 2018/5/16
 import requests
 import json
 import re
-import pymysql
 import time
 import datetime
 
+from config.db_config import conn
 
 def get_html(url, data):
     """
@@ -32,14 +32,7 @@ def get_data():
     result = pattern.sub(r'\g<datetime>', result)
     # print(result)
     list_data = json.loads(result)
-    conn = pymysql.Connect(
-        host='localhost',
-        port=3306,
-        user='root',
-        passwd='123456',
-        db='pymysql',
-        charset='utf8'
-    )
+
     cursor = conn.cursor()
     try:
         for item in list_data:
